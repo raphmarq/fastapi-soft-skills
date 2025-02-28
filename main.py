@@ -1,10 +1,20 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import openai
-import os
+from fastapi.middleware.cors import CORSMiddleware
 
-# Initialisation de l'application FastAPI
 app = FastAPI()
+
+# Spécifie ton domaine pour éviter les problèmes de sécurité
+origins = [
+    "http://www.raph.so",  # Ajoute le domaine de ton site
+    "https://www.raph.so", # Version HTTPS si activée
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Utilise la liste "origins"
+    allow_credentials=True,
+    allow_methods=["*"],  # Autoriser toutes les méthodes (GET, POST, etc.)
+    allow_headers=["*"],  # Autoriser tous les en-têtes
+)
 
 # Clé API OpenAI (assurez-vous de la configurer dans Railway)
 openai.api_key = os.getenv("OPENAI_API_KEY")
