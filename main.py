@@ -7,13 +7,13 @@ import os
 # Initialisation de l'application FastAPI
 app = FastAPI()
 
-# Configuration CORS pour accepter uniquement les requêtes de raph.so
+# Configuration CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://www.raph.so", "https://www.raph.so"],  # Autorise uniquement raph.so
     allow_credentials=True,
-    allow_methods=["POST", "GET"],  # N'autorise que les méthodes nécessaires
-    allow_headers=["Content-Type"],  # Autorise uniquement les en-têtes utiles
+    allow_methods=["POST", "GET"],  # Autorise uniquement POST et GET
+    allow_headers=["Content-Type"],  # Autorise uniquement les en-têtes nécessaires
 )
 
 # Vérification de la clé API OpenAI
@@ -33,27 +33,26 @@ def submit_test(data: TestSubmission):
     try:
         print("Réception des données:", data.dict())  # Debug
         prompt = """
-Tu es un expert en évaluation des soft skills. 
-Analyse chaque réponse selon ces critères :
-- **Clarté** : La réponse est-elle bien formulée et compréhensible ?
-- **Cohérence** : La réponse est-elle logique par rapport à la question ?
-- **Pertinence** : Apporte-t-elle une vraie information utile ?
-- **Créativité** : Montre-t-elle une réflexion originale ?
-- **Capacité de réflexion** : Démontre-t-elle un raisonnement structuré ?
-
-Attribue une note sur 100 en justifiant brièvement ton évaluation.
-Format attendu :
-- Score global : XX/100
-- Justification : [2 phrases maximum]
-
-Voici les réponses à analyser :
-"""
-for q, r in data.responses.items():
-    prompt += f"Question: {q}\nRéponse: {r}\n\n"
-
+        Tu es un expert en évaluation des soft skills.
+        Analyse chaque réponse selon ces critères :
+        - Clarté : La réponse est-elle bien formulée et compréhensible ?
+        - Cohérence : La réponse est-elle logique par rapport à la question ?
+        - Pertinence : Apporte-t-elle une vraie information utile ?
+        - Créativité : Montre-t-elle une réflexion originale ?
+        - Capacité de réflexion : Démontre-t-elle un raisonnement structuré ?
+        
+        Attribue une note sur 100 en justifiant brièvement ton évaluation.
+        Format attendu :
+        - Score global : XX/100
+        - Justification : [2 phrases maximum]
+        
+        Voici les réponses à analyser :
+        """
+        for q, r in data.responses.items():
+            prompt += f"\nQuestion: {q}\nRéponse: {r}\n"
 
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o",  # Modèle à utiliser
             messages=[
                 {"role": "system", "content": "Tu es un évaluateur expert en soft skills."},
                 {"role": "user", "content": prompt}
