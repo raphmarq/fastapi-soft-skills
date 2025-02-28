@@ -7,18 +7,20 @@ import os
 # Initialisation de l'application FastAPI
 app = FastAPI()
 
-# Configuration CORS pour éviter les blocages
+# Configuration CORS pour accepter uniquement les requêtes de raph.so
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Accepte toutes les origines (à restreindre en production)
+    allow_origins=["http://www.raph.so", "https://www.raph.so"],  # Restreindre aux domaines autorisés
     allow_credentials=True,
-    allow_methods=["*"],  # Autorise toutes les méthodes HTTP (GET, POST, etc.)
-    allow_headers=["*"],  # Autorise tous les en-têtes
+    allow_methods=["GET", "POST"],  # Limiter aux méthodes utilisées
+    allow_headers=["Content-Type"],  # Restreindre aux en-têtes nécessaires
 )
 
-# Clé API OpenAI (assurez-vous de la configurer dans Railway)
-openai.api_key = os.getenv("OPENAI_API_KEY")
-client = openai.OpenAI()
+# Vérification de la clé API OpenAI
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("La clé API OpenAI n'est pas définie.")
+client = openai.OpenAI(api_key=api_key)
 
 # Modèle de données pour les requêtes
 class TestSubmission(BaseModel):
@@ -53,3 +55,6 @@ def submit_test(data: TestSubmission):
 @app.get("/")
 def read_root():
     return {"message": "API FastAPI de test de soft skills en ligne !"}
+
+# Log des routes disponibles pour le debug
+print("Routes disponibles :", [route.path for route in app.routes])
