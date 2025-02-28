@@ -10,10 +10,10 @@ app = FastAPI()
 # Configuration CORS pour accepter uniquement les requêtes de raph.so
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://www.raph.so", "https://www.raph.so"],  # Restreindre aux domaines autorisés
+    allow_origins=["http://www.raph.so", "https://www.raph.so"],  # Autorise uniquement raph.so
     allow_credentials=True,
-    allow_methods=["GET", "POST"],  # Limiter aux méthodes utilisées
-    allow_headers=["Content-Type"],  # Restreindre aux en-têtes nécessaires
+    allow_methods=["POST", "GET"],  # N'autorise que les méthodes nécessaires
+    allow_headers=["Content-Type"],  # Autorise uniquement les en-têtes utiles
 )
 
 # Vérification de la clé API OpenAI
