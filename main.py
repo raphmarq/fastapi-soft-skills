@@ -32,9 +32,25 @@ class TestSubmission(BaseModel):
 def submit_test(data: TestSubmission):
     try:
         print("Réception des données:", data.dict())  # Debug
-        prompt = "Évalue ces réponses de test de soft skills et attribue une note sur 100 à chaque question :\n"
-        for q, r in data.responses.items():
-            prompt += f"Question: {q}\nRéponse: {r}\n\n"
+        prompt = """
+Tu es un expert en évaluation des soft skills. 
+Analyse chaque réponse selon ces critères :
+- **Clarté** : La réponse est-elle bien formulée et compréhensible ?
+- **Cohérence** : La réponse est-elle logique par rapport à la question ?
+- **Pertinence** : Apporte-t-elle une vraie information utile ?
+- **Créativité** : Montre-t-elle une réflexion originale ?
+- **Capacité de réflexion** : Démontre-t-elle un raisonnement structuré ?
+
+Attribue une note sur 100 en justifiant brièvement ton évaluation.
+Format attendu :
+- Score global : XX/100
+- Justification : [2 phrases maximum]
+
+Voici les réponses à analyser :
+"""
+for q, r in data.responses.items():
+    prompt += f"Question: {q}\nRéponse: {r}\n\n"
+
 
         response = client.chat.completions.create(
             model="gpt-4o",
