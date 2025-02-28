@@ -37,7 +37,7 @@ def submit_test(data: TestSubmission):
             prompt += f"Question: {q}\nRéponse: {r}\n\n"
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4-turbo",
             messages=[
                 {"role": "system", "content": "Tu es un évaluateur expert en soft skills."},
                 {"role": "user", "content": prompt}
