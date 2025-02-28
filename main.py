@@ -18,6 +18,7 @@ app.add_middleware(
 
 # Clé API OpenAI (assurez-vous de la configurer dans Railway)
 openai.api_key = os.getenv("OPENAI_API_KEY")
+client = openai.OpenAI()
 
 # Modèle de données pour les requêtes
 class TestSubmission(BaseModel):
@@ -33,7 +34,7 @@ def submit_test(data: TestSubmission):
         for q, r in data.responses.items():
             prompt += f"Question: {q}\nRéponse: {r}\n\n"
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Tu es un évaluateur expert en soft skills."},
@@ -41,7 +42,7 @@ def submit_test(data: TestSubmission):
             ]
         )
 
-        evaluation = response["choices"][0]["message"]["content"]
+        evaluation = response.choices[0].message.content
         return {"user_id": data.user_id, "test_id": data.test_id, "evaluation": evaluation}
 
     except Exception as e:
