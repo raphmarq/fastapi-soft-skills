@@ -28,12 +28,11 @@ class TestSubmission(BaseModel):
 @app.post("/submit_test")
 def submit_test(data: TestSubmission):
     try:
-        # Génération de la demande d'évaluation
+        print("Réception des données:", data.dict())  # Debug
         prompt = "Évalue ces réponses de test de soft skills et attribue une note sur 100 à chaque question :\n"
         for q, r in data.responses.items():
             prompt += f"Question: {q}\nRéponse: {r}\n\n"
-        
-        # Appel à OpenAI pour générer l'évaluation
+
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -41,12 +40,13 @@ def submit_test(data: TestSubmission):
                 {"role": "user", "content": prompt}
             ]
         )
-        
+
         evaluation = response["choices"][0]["message"]["content"]
-        
         return {"user_id": data.user_id, "test_id": data.test_id, "evaluation": evaluation}
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("Erreur dans l'API:", str(e))  # Log dans Railway
+        raise HTTPException(status_code=500, detail=f"Erreur interne : {str(e)}")
 
 # Route de test
 @app.get("/")
